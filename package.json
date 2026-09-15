@@ -1,0 +1,30 @@
+{
+  "name": "learnwise-ai",
+  "version": "1.0.0",
+  "description": "AI-Based Learning Resource Finder - Your AI-Powered Research & Learning Companion",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": [
+    "ai",
+    "learning",
+    "education",
+    "resources",
+    "finder"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

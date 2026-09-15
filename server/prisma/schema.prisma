@@ -1,0 +1,269 @@
+// LearnWise AI - Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id                String              @id @default(uuid())
+  email             String              @unique
+  password          String
+  name              String
+  educationLevel    String?
+  fieldOfStudy      String?
+  skillLevel        String              @default("BEGINNER") // BEGINNER, INTERMEDIATE, ADVANCED
+  interests         String[]
+  preferredResources String[]           @default(["VIDEO", "ARTICLE", "TUTORIAL"])
+  
+  isAdmin           Boolean             @default(false)
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  projects          Project[]
+  savedResources    SavedResource[]
+  ratings           Rating[]
+  searchHistory     SearchHistory[]
+  interactions      ResourceInteraction[]
+  collections       Collection[]
+  chatMessages      ChatMessage[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// Project Model
+model Project {
+  id                String            @id @default(uuid())
+  userId            String
+  title             String
+  description       String            @db.Text
+  domain            String
+  technologies      String[]
+  skillLevel        String            @default("BEGINNER")
+  projectType       String            // ACADEMIC, PERSONAL, FINAL_YEAR, RESEARCH, HACKATHON, COMPETITION
+  currentStage      String            @default("IDEA") // IDEA, RESEARCH, LEARNING, DEVELOPMENT, TESTING, DOCUMENTATION, PRESENTATION
+  goals             String?           @db.Text
+  deadline          DateTime?
+  progress          Int               @default(0)
+  
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Relations
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningPath      LearningPath?
+  searchHistory     SearchHistory[]
+  savedResources    SavedResource[]
+
+  @@index([userId])
+  @@index([currentStage])
+  @@map("projects")
+}
+
+// Resource Model (cached/normalized resources)
+model Resource {
+  id                String              @id @default(uuid())
+  title             String
+  description       String?             @db.Text
+  url               String
+  type              String              // VIDEO, ARTICLE, PAPER, TUTORIAL, COURSE, DOCUMENTATION, GITHUB, BOOK
+  source            String              // YOUTUBE, GITHUB, OPENALEX, WEB, etc.
+  author            String?
+  thumbnail         String?
+  publishedDate     DateTime?
+  duration          String?
+  
+  // Metadata
+  topics            String[]
+  difficulty        String?             // BEGINNER, INTERMEDIATE, ADVANCED
+  language          String?             @default("en")
+  
+  // Scoring
+  credibilityScore  Float               @default(0)
+  popularityScore   Float               @default(0)
+  
+  // External IDs
+  externalId        String?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  savedBy           SavedResource[]
+  ratings           Rating[]
+  interactions      ResourceInteraction[]
+
+  @@unique([source, externalId])
+  @@index([type])
+  @@index([source])
+  @@map("resources")
+}
+
+// Saved Resource Model
+model SavedResource {
+  id            String      @id @default(uuid())
+  userId        String
+  resourceId    String
+  projectId     String?
+  collectionId  String?
+  notes         String?     @db.Text
+  
+  createdAt     DateTime    @default(now())
+  
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource      Resource    @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  project       Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  collection    Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, resourceId])
+  @@index([userId])
+  @@index([projectId])
+  @@map("saved_resources")
+}
+
+// Rating Model
+model Rating {
+  id          String    @id @default(uuid())
+  userId      String
+  resourceId  String
+  rating      Int       // 1-5
+  feedback    String?
+  isUseful    Boolean?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource    Resource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resourceId])
+  @@index([resourceId])
+  @@map("ratings")
+}
+
+// Learning Path Model
+model LearningPath {
+  id          String              @id @default(uuid())
+  projectId   String              @unique
+  title       String
+  description String?             @db.Text
+  
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  // Relations
+  project     Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items       LearningPathItem[]
+
+  @@map("learning_paths")
+}
+
+// Learning Path Item Model
+model LearningPathItem {
+  id              String        @id @default(uuid())
+  learningPathId  String
+  title           String
+  description     String?       @db.Text
+  order           Int
+  isCompleted     Boolean       @default(false)
+  resources       String[]      // Array of resource IDs
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  learningPath    LearningPath  @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+
+  @@index([learningPathId])
+  @@map("learning_path_items")
+}
+
+// Search History Model
+model SearchHistory {
+  id          String    @id @default(uuid())
+  userId      String
+  projectId   String?
+  query       String
+  stage       String?
+  skillLevel  String?
+  filters     Json?
+  resultsCount Int      @default(0)
+  
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("search_history")
+}
+
+// Resource Interaction Model
+model ResourceInteraction {
+  id          String    @id @default(uuid())
+  userId      String
+  resourceId  String
+  action      String    // VIEW, CLICK, SAVE, UNSAVE, RATE, NOT_RELEVANT
+  metadata    Json?
+  
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource    Resource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([resourceId])
+  @@index([action])
+  @@map("resource_interactions")
+}
+
+// Collection Model
+model Collection {
+  id          String            @id @default(uuid())
+  userId      String
+  name        String
+  description String?           @db.Text
+  isPublic    Boolean           @default(false)
+  
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  // Relations
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resources   SavedResource[]
+
+  @@index([userId])
+  @@map("collections")
+}
+
+// Chat Message Model (AI Assistant)
+model ChatMessage {
+  id          String    @id @default(uuid())
+  userId      String
+  projectId   String?
+  role        String    // USER, ASSISTANT
+  content     String    @db.Text
+  metadata    Json?
+  
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("chat_messages")
+}
