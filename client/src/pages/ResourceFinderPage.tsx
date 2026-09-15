@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Search, Filter, SlidersHorizontal, ExternalLink, Star, BookmarkPlus, BookmarkCheck, ThumbsUp, ThumbsDown, Info } from 'lucide-react';
+import { Sparkles, Search, SlidersHorizontal, ExternalLink, Star, BookmarkPlus, BookmarkCheck, ThumbsUp, Info } from 'lucide-react';
 import { useProjectStore } from '../store/projectStore';
 import { projectService } from '../services/projectService';
 import { resourceService } from '../services/resourceService';
-import { Resource, ResourceType, SearchFilters } from '../types/resource.types';
+import { Resource, SearchFilters } from '../types/resource.types';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -49,7 +49,7 @@ const ResourceFinderPage = () => {
   const loadSavedResources = async () => {
     try {
       const response = await resourceService.getSavedResources();
-      const ids = new Set(response.data.map((sr: any) => sr.resourceId));
+      const ids = new Set<string>(response.data.map((sr: { resourceId: string }) => sr.resourceId));
       setSavedResourceIds(ids);
     } catch (error) {
       console.error('Failed to load saved resources');

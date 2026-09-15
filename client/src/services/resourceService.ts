@@ -1,5 +1,5 @@
 import api from './api';
-import { Resource, SearchFilters } from '../types/resource.types';
+import { SearchFilters } from '../types/resource.types';
 
 export const resourceService = {
   searchResources: async (data: {

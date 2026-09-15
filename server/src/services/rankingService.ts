@@ -1,5 +1,4 @@
 import { NormalizedResource, DifficultyLevel } from '../types/resource.types';
-import { ProjectStage } from '../types/project.types';
 
 // Ranking weights (must sum to 1.0)
 const WEIGHTS = {

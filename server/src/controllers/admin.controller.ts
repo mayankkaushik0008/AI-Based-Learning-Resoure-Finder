@@ -3,7 +3,7 @@ import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/auth';
 
 export const getAdminStats = async (
-  req: AuthRequest,
+  _req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {

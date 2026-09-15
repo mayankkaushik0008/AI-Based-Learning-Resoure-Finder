@@ -1,14 +1,10 @@
 import { Router } from 'express';
 import { protect } from '../middleware/auth';
+import { getGeneralRecommendations, getProjectRecommendations } from '../controllers/recommendation.controller';
 
 const router = Router();
 
-router.get('/', protect, (req, res) => {
-  res.json({ success: true, data: [], message: 'Recommendations - to be implemented' });
-});
-
-router.get('/project/:projectId', protect, (req, res) => {
-  res.json({ success: true, data: [], message: 'Project recommendations - to be implemented' });
-});
+router.get('/', protect, getGeneralRecommendations);
+router.get('/project/:projectId', protect, getProjectRecommendations);
 
 export default router;

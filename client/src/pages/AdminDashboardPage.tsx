@@ -224,7 +224,7 @@ const AdminDashboardPage = () => {
             </div>
             <p className="text-sm font-medium text-gray-700">AI Service</p>
             <p className="text-lg font-bold text-blue-600">
-              {process.env.DEMO_MODE === 'true' ? 'Demo Mode' : 'Active'}
+              {import.meta.env.VITE_DEMO_MODE === 'true' ? 'Demo Mode' : 'Active'}
             </p>
           </div>
         </div>

@@ -13,6 +13,15 @@ interface LoginData {
   password: string;
 }
 
+export interface UpdateProfileData {
+  name?: string;
+  educationLevel?: string;
+  fieldOfStudy?: string;
+  skillLevel?: string;
+  interests?: string[];
+  preferredResources?: string[];
+}
+
 export const authService = {
   register: async (data: RegisterData) => {
     const response = await api.post('/auth/register', data);
@@ -29,7 +38,7 @@ export const authService = {
     return response.data;
   },
 
-  updateProfile: async (data: Partial<RegisterData>) => {
+  updateProfile: async (data: UpdateProfileData) => {
     const response = await api.put('/auth/profile', data);
     return response.data;
   },

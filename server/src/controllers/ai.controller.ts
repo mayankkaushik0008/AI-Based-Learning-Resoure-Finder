@@ -62,9 +62,8 @@ export const chatController = async (
         },
       });
 
-      if (project) {
-        projectContext = `User is working on: ${project.title}. Description: ${project.description}. Technologies: ${project.technologies.join(', ')}. Current stage: ${project.currentStage}.`;
-      }
+      if (!project) throw new AppError('Project not found', 404);
+      projectContext = `User is working on: ${project.title}. Description: ${project.description}. Technologies: ${project.technologies.join(', ')}. Current stage: ${project.currentStage}.`;
     }
 
     // Get recent chat history
@@ -127,6 +126,10 @@ export const getChatHistory = async (
 ) => {
   try {
     const { projectId, limit = 50 } = req.query;
+    const requestedLimit = Number(limit);
+    const safeLimit = Number.isInteger(requestedLimit)
+      ? Math.min(Math.max(requestedLimit, 1), 100)
+      : 50;
 
     const messages = await prisma.chatMessage.findMany({
       where: {
@@ -136,7 +139,7 @@ export const getChatHistory = async (
       orderBy: {
         createdAt: 'desc',
       },
-      take: Number(limit),
+      take: safeLimit,
     });
 
     res.json({

@@ -16,6 +16,10 @@ import collectionRoutes from './routes/collection.routes';
 
 dotenv.config();
 
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET must be configured in production');
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -28,7 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'LearnWise AI Server is running' });
 });
 

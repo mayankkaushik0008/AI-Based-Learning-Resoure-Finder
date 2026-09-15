@@ -10,9 +10,17 @@ export interface AuthRequest extends Request {
   };
 }
 
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new AppError('JWT_SECRET must be configured in production', 500);
+  }
+  return secret || 'development-only-secret';
+};
+
 export const protect = async (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   try {
@@ -28,7 +36,7 @@ export const protect = async (
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'default-secret'
+      getJwtSecret()
     ) as {
       id: string;
       email: string;
@@ -44,7 +52,7 @@ export const protect = async (
 
 export const adminOnly = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   if (!req.user?.isAdmin) {

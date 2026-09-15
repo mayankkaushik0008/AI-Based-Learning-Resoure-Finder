@@ -22,6 +22,7 @@ export const searchResourcesController = async (
     } = req.body;
 
     let searchQuery: SearchQuery;
+    let searchHistoryId: string | undefined;
 
     if (projectId) {
       // Search based on project
@@ -58,7 +59,7 @@ export const searchResourcesController = async (
       };
 
       // Save search history
-      await prisma.searchHistory.create({
+      const searchHistory = await prisma.searchHistory.create({
         data: {
           userId: req.user!.id,
           projectId: project.id,
@@ -69,6 +70,7 @@ export const searchResourcesController = async (
           resultsCount: 0, // Will update after search
         },
       });
+      searchHistoryId = searchHistory.id;
     } else if (customQuery) {
       // Custom search query
       searchQuery = {
@@ -83,7 +85,7 @@ export const searchResourcesController = async (
       };
 
       // Save search history
-      await prisma.searchHistory.create({
+      const searchHistory = await prisma.searchHistory.create({
         data: {
           userId: req.user!.id,
           query: customQuery,
@@ -93,6 +95,7 @@ export const searchResourcesController = async (
           resultsCount: 0,
         },
       });
+      searchHistoryId = searchHistory.id;
     } else {
       throw new AppError('Either projectId or customQuery is required', 400);
     }
@@ -104,10 +107,11 @@ export const searchResourcesController = async (
       limit: 30,
     });
 
-    // Cache resources in database for future reference
-    for (const resource of resources.slice(0, 10)) {
-      try {
-        await prisma.resource.upsert({
+    // Cache every displayed resource and return the database ID needed for save/rate actions.
+    const cachedResources = await Promise.all(
+      resources.map(async (resource) => {
+        try {
+          return await prisma.resource.upsert({
           where: {
             source_externalId: {
               source: resource.source,
@@ -137,17 +141,30 @@ export const searchResourcesController = async (
             externalId: resource.externalId || resource.url,
             language: resource.language,
           },
-        });
-      } catch (cacheError) {
-        // Ignore cache errors, continue with search
-        console.error('Resource caching error:', cacheError);
-      }
+          });
+        } catch (cacheError) {
+          console.error('Resource caching error:', cacheError);
+          return undefined;
+        }
+      })
+    );
+
+    if (searchHistoryId) {
+      await prisma.searchHistory.update({
+        where: { id: searchHistoryId },
+        data: { resultsCount: resources.length },
+      });
     }
+
+    const resourcesWithIds = resources.map((resource, index) => ({
+      ...resource,
+      id: cachedResources[index]?.id,
+    }));
 
     res.json({
       success: true,
       data: {
-        resources,
+        resources: resourcesWithIds,
         query: searchQuery,
         totalResults: resources.length,
       },
@@ -165,6 +182,10 @@ export const saveResource = async (
   try {
     const { resourceId, projectId, collectionId, notes } = req.body;
 
+    if (!resourceId) {
+      throw new AppError('Resource ID is required', 400);
+    }
+
     // Check if resource exists
     const resource = await prisma.resource.findUnique({
       where: { id: resourceId },
@@ -172,6 +193,22 @@ export const saveResource = async (
 
     if (!resource) {
       throw new AppError('Resource not found', 404);
+    }
+
+    if (projectId) {
+      const project = await prisma.project.findFirst({
+        where: { id: projectId, userId: req.user!.id },
+        select: { id: true },
+      });
+      if (!project) throw new AppError('Project not found', 404);
+    }
+
+    if (collectionId) {
+      const collection = await prisma.collection.findFirst({
+        where: { id: collectionId, userId: req.user!.id },
+        select: { id: true },
+      });
+      if (!collection) throw new AppError('Collection not found', 404);
     }
 
     // Check if already saved
@@ -274,7 +311,7 @@ export const rateResource = async (
   try {
     const { resourceId, rating, feedback, isUseful } = req.body;
 
-    if (!rating || rating < 1 || rating > 5) {
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
       throw new AppError('Rating must be between 1 and 5', 400);
     }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Sparkles, RefreshCw } from 'lucide-react';
+import { Send, Bot, User, RefreshCw } from 'lucide-react';
 import { useProjectStore } from '../store/projectStore';
 import { projectService } from '../services/projectService';
 import { aiService } from '../services/aiService';

@@ -5,11 +5,22 @@ import prisma from '../utils/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new AppError('JWT_SECRET must be configured in production', 500);
+  }
+  return secret || 'development-only-secret';
+};
+
 const generateToken = (id: string, email: string, isAdmin: boolean): string => {
+  const options: jwt.SignOptions = {
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as jwt.SignOptions['expiresIn'],
+  };
   return jwt.sign(
     { id, email, isAdmin },
-    process.env.JWT_SECRET || 'default-secret',
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    getJwtSecret(),
+    options
   );
 };
 
