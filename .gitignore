@@ -43,6 +43,10 @@ coverage/
 # Prisma
 server/prisma/dev.db
 server/prisma/dev.db-journal
+server/prisma/migrations/
+
+# Setup scripts (local use only)
+setup-complete.bat
 
 # OS
 Thumbs.db

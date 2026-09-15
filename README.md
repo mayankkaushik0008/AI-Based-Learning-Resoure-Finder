@@ -1,816 +1,306 @@
 # 🎓 LearnWise AI - AI-Based Learning Resource Finder
 
-**"Learn Fast. Learn Smart. Let AI Lead the Way."**
-
-LearnWise AI is an intelligent, full-stack web application that helps students discover high-quality learning resources tailored to their project needs, skill level, and current project stage. Using AI-powered search and personalized recommendations, it eliminates the time wasted on irrelevant content and delivers curated educational materials.
-
-## ✨ Features
-
-- 🤖 **AI-Powered Resource Discovery** - Intelligent search that understands your project context
-- 🎯 **Personalized Recommendations** - Resources matched to your skill level and learning goals
-- 📊 **Smart Ranking System** - Credibility scores and relevance metrics for every resource
-- 📚 **Multiple Resource Types** - Videos, articles, tutorials, research papers, GitHub repos, and more
-- 🗺️ **AI-Generated Learning Paths** - Step-by-step guides customized for your projects
-- 💬 **AI Assistant** - Contextual help and guidance throughout your learning journey
-- 🔖 **Save & Organize** - Create collections and manage your learning resources
-- ⭐ **Rating System** - Rate resources to improve recommendations
-- 📈 **Progress Tracking** - Monitor your learning journey across projects
-- 👤 **User Profiles** - Personalized experience based on your field and interests
-- 🔐 **Secure Authentication** - JWT-based auth with bcrypt password hashing
-- 👑 **Admin Dashboard** - Analytics and resource management
-
-## 🏗️ Architecture
-
-```
-learnwise-ai/
-├── client/                # React + TypeScript + Vite frontend
-│   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── pages/         # Page components
-│   │   ├── layouts/       # Layout components
-│   │   ├── services/      # API service layer
-│   │   ├── store/         # Zustand state management
-│   │   └── types/         # TypeScript types
-│   └── ...
-├── server/                # Node.js + Express + TypeScript backend
-│   ├── src/
-│   │   ├── controllers/   # Request handlers
-│   │   ├── routes/        # API routes
-│   │   ├── services/      # Business logic (AI, search, ranking)
-│   │   ├── middleware/    # Auth, error handling
-│   │   ├── utils/         # Helper functions
-│   │   └── types/         # TypeScript types
-│   ├── prisma/            # Database schema and migrations
-│   └── ...
-├── .env.example           # Environment variables template
-└── README.md
-```
-
-## 🚀 Tech Stack
-
-### Frontend
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Fast build tool
-- **Tailwind CSS** - Utility-first styling
-- **Zustand** - State management
-- **React Router** - Client-side routing
-- **Axios** - HTTP client
-- **Lucide React** - Icon library
-- **React Hot Toast** - Notifications
-
-### Backend
-- **Node.js** - Runtime environment
-- **Express** - Web framework
-- **TypeScript** - Type safety
-- **Prisma** - ORM for database
-- **PostgreSQL** - Relational database
-- **JWT** - Authentication
-- **bcryptjs** - Password hashing
-
-### AI & External APIs
-- **OpenAI API** - AI-powered analysis and recommendations
-- **YouTube Data API** - Educational video discovery
-- **GitHub API** - Repository search
-- **OpenAlex** - Academic papers and research
-
-## 📋 Prerequisites
-
-- Node.js 18+ and npm
-- PostgreSQL 14+
-- (Optional) API keys for external services
-
-## 🔧 Installation
-
-### 1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd learnwise-ai
-```
-
-### 2. Install dependencies
-
-```bash
-# Install root dependencies
-npm install
-
-# Install client and server dependencies
-npm run install:all
-```
-
-### 3. Set up environment variables
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and configure:
-
-```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/learnwise_ai?schema=public"
-
-# JWT
-JWT_SECRET="your-super-secret-jwt-key"
-JWT_EXPIRES_IN="7d"
-
-# Server
-PORT=5000
-NODE_ENV="development"
-CLIENT_URL="http://localhost:5173"
-
-# AI Service (Optional - Demo mode available)
-OPENAI_API_KEY="your-openai-api-key"
-OPENAI_MODEL="gpt-4o-mini"
-
-# YouTube API (Optional - Demo mode available)
-YOUTUBE_API_KEY="your-youtube-api-key"
-
-# GitHub Token (Optional - Demo mode available)
-GITHUB_TOKEN="your-github-token"
-
-# Academic Resources (Optional)
-OPENALEX_EMAIL="your-email@example.com"
-
-# Demo Mode (Use mock data when APIs unavailable)
-DEMO_MODE="true"
-```
-
-### 4. Database Setup
-
-```bash
-# Navigate to server directory
-cd server
-
-# Generate Prisma Client
-npm run prisma:generate
-
-# Run migrations
-npm run prisma:migrate
-
-# Seed database with demo data
-npm run prisma:seed
-
-# (Optional) Open Prisma Studio to view data
-npm run prisma:studio
-```
-
-### 5. Run the application
-
-#### Development mode (both servers):
-
-```bash
-# From root directory
-npm run dev
-```
-
-This starts:
-- Frontend: http://localhost:5173
-- Backend: http://localhost:5000
-
-#### Or run separately:
-
-```bash
-# Terminal 1 - Backend
-cd server
-npm run dev
-
-# Terminal 2 - Frontend
-cd client
-npm run dev
-```
-
-## 🎮 Demo Credentials
-
-After seeding the database, use these credentials:
-
-**Regular User:**
-- Email: `demo@learnwise.ai`
-- Password: `demo123`
-
-**Admin User:**
-- Email: `admin@learnwise.ai`
-- Password: `demo123`
-
-## 🌐 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Create new account
-- `POST /api/auth/login` - Login
-- `GET /api/auth/me` - Get current user
-- `PUT /api/auth/profile` - Update profile
-
-### Projects
-- `GET /api/projects` - Get user's projects
-- `POST /api/projects` - Create project
-- `GET /api/projects/:id` - Get project details
-- `PUT /api/projects/:id` - Update project
-- `DELETE /api/projects/:id` - Delete project
-
-### Resources
-- `POST /api/resources/search` - AI-powered resource search
-- `GET /api/resources/:id` - Get resource details
-- `POST /api/resources/:id/save` - Save resource
-- `DELETE /api/resources/:id/save` - Unsave resource
-- `POST /api/resources/:id/rating` - Rate resource
-
-### AI Services
-- `POST /api/ai/analyze-project` - Analyze project with AI
-- `POST /api/ai/chat` - Chat with AI assistant
-- `GET /api/ai/chat/history` - Get chat history
-
-### Learning Paths
-- `GET /api/learning/path/:projectId` - Get learning path
-- `POST /api/learning/path/:projectId/generate` - Generate learning path
-- `POST /api/learning/path/item/:itemId/complete` - Mark item complete
-
-### Recommendations
-- `GET /api/recommendations` - Get personalized recommendations
-- `GET /api/recommendations/project/:projectId` - Project-specific recommendations
-
-### Admin (Protected)
-- `GET /api/admin/stats` - Platform statistics
-- `GET /api/admin/users` - User management
-- `GET /api/admin/resources` - Resource management
-
-## 🤖 AI Integration
-
-### Project Analysis
-The AI analyzes your project description to extract:
-- Main topic and subtopics
-- Required technologies
-- Necessary skills
-- Learning objectives
-- Optimized search keywords
-- Recommended resource types
-
-### Resource Ranking
-Each resource receives multiple scores:
-- **Relevance Score** (40%) - Match with project needs
-- **Credibility Score** (20%) - Source reliability
-- **Stage Match** (15%) - Alignment with current project stage
-- **Difficulty Match** (10%) - Appropriate skill level
-- **Freshness** (10%) - Content recency
-- **Popularity** (5%) - Community engagement
-
-### Demo Mode
-When API keys are not configured, the system uses realistic mock data to demonstrate full functionality.
-
-## 🎨 UI/UX Features
-
-- ✅ Fully responsive design (mobile, tablet, desktop)
-- ✅ Clean, modern interface with soft gradients
-- ✅ Skeleton loading states
-- ✅ Toast notifications
-- ✅ Empty states with guidance
-- ✅ Hover animations and transitions
-- ✅ Accessible color contrast
-- ✅ Professional educational SaaS design
-
-## 📊 Database Schema
-
-Key models:
-- **User** - Authentication and profile
-- **Project** - User projects with metadata
-- **Resource** - Normalized learning resources
-- **SavedResource** - User's saved resources
-- **Rating** - Resource ratings and feedback
-- **LearningPath** - AI-generated learning paths
-- **SearchHistory** - Track user searches
-- **Collection** - Organized resource collections
-- **ChatMessage** - AI assistant conversations
-
-## 🔒 Security
-
-- ✅ JWT-based authentication
-- ✅ Bcrypt password hashing (12 rounds)
-- ✅ Protected API routes
-- ✅ Input validation
-- ✅ CORS configuration
-- ✅ Environment variable security
-- ✅ SQL injection prevention (Prisma)
-- ✅ XSS protection
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd server
-npm test
-
-# Frontend tests
-cd client
-npm test
-```
-
-## 📦 Building for Production
-
-```bash
-# Build both client and server
-npm run build
-
-# Start production server
-npm start
-```
-
-## 🚀 Deployment
-
-### Backend (Node.js + PostgreSQL)
-Deploy to:
-- Heroku
-- Railway
-- Render
-- DigitalOcean
-- AWS/GCP/Azure
-
-### Frontend (Static Build)
-Deploy to:
-- Vercel
-- Netlify
-- AWS S3 + CloudFront
-- GitHub Pages
-
-### Database
-- Heroku Postgres
-- Railway Postgres
-- Supabase
-- AWS RDS
-
-## 🛠️ Development Status
-
-**Phase 1: ✅ COMPLETED**
-- Project structure
-- Frontend setup (React + Vite + TypeScript)
-- Backend setup (Node + Express + TypeScript)
-- Database schema (Prisma + PostgreSQL)
-- Authentication system
-- Landing page
-- Login/Register pages
-- Dashboard layout
-- Basic routing
-
-**Phases 2-15: 🚧 IN PROGRESS**
-- Full project management
-- AI resource search
-- External API integrations
-- Resource ranking
-- Saved resources
-- Recommendations
-- Learning paths
-- AI assistant
-- Admin dashboard
-- Complete UI/UX polish
-
-## 🎯 Future Enhancements
-
-- [ ] Mobile application (React Native)
-- [ ] Browser extension
-- [ ] Collaborative projects
-- [ ] Institution accounts
-- [ ] Teacher dashboards
-- [ ] Advanced analytics
-- [ ] Multi-language support
-- [ ] Offline mode
-- [ ] Export learning paths as PDF
-- [ ] Integration with LMS platforms
-
-## 📝 License
-
-MIT License - See LICENSE file for details
-
-## 👨‍💻 Contributing
-
-Contributions are welcome! Please follow these steps:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📧 Contact
-
-For questions or support, please open an issue on GitHub.
+**Intelligent platform that uses artificial intelligence to help students discover, rank, and organize high-quality learning resources tailored to their project needs.**
+
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://learnwise-frontend.onrender.com)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Flearnwise-frontend.onrender.com)](https://learnwise-frontend.onrender.com)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
 
-**Built with ❤️ for students, by students**
+## 📌 Overview
 
-*LearnWise AI - Transforming how students discover and learn*
+LearnWise AI is a full-stack web application that revolutionizes how students find learning resources. Instead of wasting hours searching through millions of irrelevant results, students get curated, AI-ranked resources matched to their skill level, project stage, and learning goals.
 
+🌐 **[Try it live!](https://learnwise-frontend.onrender.com)**
 
-## 📚 Additional Documentation
+### 🎯 Problem Solved
 
-- **[Installation Guide](./INSTALLATION.md)** - Step-by-step setup instructions
-- **[Deployment Guide](./DEPLOYMENT.md)** - Deploy to production platforms
-- **[Feature List](./FEATURES.md)** - Complete feature documentation
-- **[Project Summary](./PROJECT_SUMMARY.md)** - Technical overview and achievements
+- **40%** of project time wasted searching for materials
+- Information overload with millions of generic results
+- Difficulty judging resource quality and credibility
+- No personalization by skill level or project stage
+- Disconnected learning experience
 
-## 🎯 Quick Start Guide
+### 💡 Solution
 
-### 1. Prerequisites
+LearnWise AI analyzes your project, searches multiple sources simultaneously (YouTube, GitHub, Academic papers), ranks resources using a sophisticated 6-factor algorithm, and provides personalized learning paths with AI assistance.
+
+---
+
+## ✨ Key Features
+
+### 🤖 AI-Powered Features
+- **Intelligent Project Analysis** - NLP-based understanding of project requirements
+- **Multi-Source Search** - YouTube videos, GitHub repos, academic papers
+- **Smart Ranking Algorithm** - 6-factor weighted scoring (relevance, credibility, difficulty, etc.)
+- **AI-Generated Learning Paths** - Personalized step-by-step guides
+- **AI Assistant Chatbot** - Context-aware learning guidance
+
+### 📊 Core Functionality
+- **User Authentication** - Secure JWT-based auth with bcrypt
+- **Project Management** - Create and track multiple projects
+- **Resource Discovery** - Search, filter, and sort by type/difficulty/date
+- **Save & Organize** - Collections, notes, and ratings
+- **Progress Tracking** - Learning path completion monitoring
+- **Admin Dashboard** - Analytics, user management, system stats
+
+---
+
+## 🏗️ Technical Architecture
+
+### Tech Stack
+
+**Frontend:**
+- React 18 + TypeScript
+- Vite (build tool)
+- Tailwind CSS
+- Zustand (state management)
+- Axios (HTTP client)
+
+**Backend:**
 - Node.js 18+
-- PostgreSQL 14+
+- Express 4
+- TypeScript
+- Prisma ORM
+- JWT Authentication
+- Bcrypt password hashing
+
+**Database:**
+- PostgreSQL 15
+- Prisma migrations
+- Normalized schema
+
+**External APIs:**
+- OpenAI (AI analysis, chat)
+- YouTube Data API v3
+- GitHub API
+- OpenAlex (academic papers)
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────┐
+│         React Frontend                  │
+│   TypeScript + Tailwind + Zustand      │
+└──────────────┬──────────────────────────┘
+               │ REST API
+┌──────────────▼──────────────────────────┐
+│         Express Backend                 │
+│   Controllers → Services → Database     │
+└──────────────┬──────────────────────────┘
+               │
+        ┌──────┴──────┐
+        │             │
+┌───────▼─────┐  ┌───▼─────────┐
+│ PostgreSQL  │  │ External    │
+│  Database   │  │ AI APIs     │
+└─────────────┘  └─────────────┘
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18 or higher
+- PostgreSQL 14 or higher (or Docker)
 - npm or yarn
 
-### 2. Installation
+### Quick Start
+
+1. **Clone the repository**
 ```bash
-# Clone and install
+git clone https://github.com/mayankkaushik0008/AI-Based-Learning-Resoure-Finder.git
+cd AI-Based-Learning-Resoure-Finder
+```
+
+2. **Setup with Docker (Recommended)**
+```bash
+# Start PostgreSQL
+docker compose up -d
+
+# Install dependencies
 npm install
-cd client && npm install
-cd ../server && npm install
+cd server && npm install
+cd ../client && npm install
+cd ..
 ```
 
-### 3. Configuration
+3. **Configure Environment**
 ```bash
-# Copy environment template
-cp .env.example .env
+# Create .env file in server directory
+cp .env.example server/.env
 
-# Edit .env with your settings (or use DEMO_MODE=true)
+# Edit server/.env with your database credentials
 ```
 
-### 4. Database Setup
+4. **Setup Database**
 ```bash
 cd server
 npm run prisma:generate
 npm run prisma:migrate
 npm run prisma:seed
+cd ..
 ```
 
-### 5. Start Development
+5. **Start Application**
 ```bash
-# From root directory
 npm run dev
-
-# Or separately:
-# Terminal 1: cd server && npm run dev
-# Terminal 2: cd client && npm run dev
 ```
 
-### 6. Access Application
-- **Frontend**: http://localhost:5173
-- **Backend**: http://localhost:5000
-- **API Health**: http://localhost:5000/api/health
+6. **Access Application**
+- Frontend: http://localhost:5173
+- Backend: http://localhost:5000
 
-### 7. Login
-Use demo credentials:
+**Demo Credentials:**
 - Email: `demo@learnwise.ai`
 - Password: `demo123`
 
-## 🎨 Screenshots
+---
 
-### Landing Page
-Beautiful, professional landing page with clear value proposition, feature highlights, and call-to-action buttons.
+## 📖 Documentation
 
-### Dashboard
-Personalized dashboard showing project statistics, recent projects, and recommended resources.
+- **[INSTALLATION.md](INSTALLATION.md)** - Detailed setup instructions
+- **[FEATURES.md](FEATURES.md)** - Complete feature list
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide
 
-### AI Resource Finder
-Intelligent search interface with AI-powered recommendations, match scores, and detailed explanations.
+---
 
-### Saved Resources
-Organize and manage your bookmarked learning materials with search, filters, and notes.
+## 🎯 Usage
 
-### Learning Paths
-AI-generated step-by-step guides with progress tracking and visual indicators.
+### Creating a Project
 
-### AI Assistant
-Conversational chatbot with project context awareness and personalized guidance.
+1. Login to your account
+2. Navigate to Projects page
+3. Click "Create Project"
+4. Fill in project details (title, description, tech stack, skill level)
+5. Submit
 
-### Admin Dashboard
-Comprehensive analytics with charts, statistics, and system health monitoring.
+### Finding Resources
 
-## 🛠️ Technology Deep Dive
+1. Open a project
+2. Click "Find Resources"
+3. AI analyzes your project automatically
+4. View ranked results with match scores and explanations
+5. Filter by type, difficulty, or date
+6. Save relevant resources
 
-### Frontend Architecture
-```
-client/
-├── src/
-│   ├── components/      # Reusable UI components
-│   ├── pages/          # Page components
-│   ├── layouts/        # Layout wrappers
-│   ├── services/       # API communication
-│   ├── store/          # State management (Zustand)
-│   ├── types/          # TypeScript interfaces
-│   └── utils/          # Helper functions
-```
+### Generating Learning Path
 
-### Backend Architecture
-```
-server/
-├── src/
-│   ├── controllers/    # Request handlers
-│   ├── routes/         # API endpoints
-│   ├── services/       # Business logic
-│   │   ├── aiService.ts          # OpenAI integration
-│   │   ├── youtubeService.ts     # YouTube API
-│   │   ├── githubService.ts      # GitHub API
-│   │   ├── academicService.ts    # Academic papers
-│   │   ├── rankingService.ts     # Resource ranking
-│   │   └── resourceSearchService.ts # Search orchestration
-│   ├── middleware/     # Auth, error handling
-│   ├── types/          # TypeScript interfaces
-│   └── utils/          # Helper functions
-├── prisma/
-│   ├── schema.prisma   # Database schema
-│   └── seed.ts         # Seed data
-```
+1. Open a project
+2. Click "Generate Learning Path"
+3. AI creates personalized step-by-step guide
+4. Check off completed items
+5. Track your progress
 
-## 🔐 Security Features
+### Using AI Assistant
 
-- ✅ JWT authentication with secure token storage
-- ✅ bcrypt password hashing (12 rounds)
-- ✅ SQL injection prevention (Prisma ORM)
-- ✅ XSS protection (React)
-- ✅ CORS configuration
-- ✅ Input validation
-- ✅ Environment variable protection
-- ✅ Protected API routes
-- ✅ Role-based access control
-- ✅ Secure session management
+1. Navigate to AI Assistant page
+2. Select a project for context
+3. Ask questions about resources or concepts
+4. Get context-aware guidance
 
-## 🚀 Performance Optimizations
+---
 
-- Parallel API calls for resource discovery
-- Database query optimization with indexes
-- Efficient React re-renders
-- Lazy loading and code splitting
-- Image optimization with fallbacks
-- Debounced search inputs
-- Response caching strategies
-- Minimal bundle size with Vite
+## 🔒 Security Features
 
-## 📊 Database Schema Highlights
+- JWT-based authentication
+- Bcrypt password hashing (12 rounds)
+- Protected API routes
+- SQL injection prevention (Prisma ORM)
+- XSS protection (React)
+- CORS configuration
+- Input validation
+- Environment variable security
 
-### Core Models
-- **User** - Authentication and profile
-- **Project** - Project management with metadata
-- **Resource** - Normalized learning resources
-- **SavedResource** - User bookmarks
-- **Rating** - Resource feedback
-- **LearningPath** - AI-generated curricula
-- **SearchHistory** - Analytics tracking
-- **ChatMessage** - AI assistant conversations
+---
 
-### Relationships
-- User → Projects (1:many)
-- Project → LearningPath (1:1)
-- User → SavedResources (1:many)
-- Resource → SavedResources (1:many)
-- Resource → Ratings (1:many)
+## 📊 Project Statistics
 
-## 🌟 Standout Features
+- **67+ files** created
+- **15,000+ lines** of code
+- **100+ features** implemented
+- **30+ API endpoints**
+- **10+ database models**
+- **29 React components**
+- **15+ pages**
 
-1. **AI-Powered Ranking** - Sophisticated weighted scoring algorithm
-2. **Multi-Source Aggregation** - YouTube, GitHub, Academic papers in one search
-3. **Context-Aware Chat** - AI assistant that understands your projects
-4. **Auto-Generated Learning Paths** - Personalized curricula
-5. **Demo Mode** - Full functionality without API keys
-6. **Professional UI** - Modern, responsive, accessible design
-7. **Comprehensive Admin** - Full analytics dashboard
-8. **Progress Tracking** - Visual learning journey
-9. **Smart Filtering** - Advanced search and sort options
-10. **Resource Management** - Save, rate, organize, annotate
+---
 
-## 🧪 Testing
+## 🌐 Deployment
 
-### Backend Testing
-```bash
-cd server
-npm test
-```
+### Deployed on Render
 
-### Frontend Testing
-```bash
-cd client
-npm test
-```
+- **Frontend:** Static site hosting
+- **Backend:** Web service
+- **Database:** PostgreSQL instance
 
-### E2E Testing
-```bash
-npm run test:e2e
-```
+**Live Demo:** [https://learnwise-frontend.onrender.com](https://learnwise-frontend.onrender.com)
 
-## 📈 Monitoring & Analytics
+> **Note:** Free tier services may take 30-60 seconds to wake up on first request after inactivity.
 
-### Built-in Analytics
-- User registration tracking
-- Project creation metrics
-- Search activity
-- Resource engagement
-- Popular topics
-- System health
+### Deploy Your Own
 
-### Recommended Tools
-- **Sentry** - Error tracking
-- **LogRocket** - Session replay
-- **Google Analytics** - User analytics
-- **Mixpanel** - Product analytics
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions on deploying to:
+- Render
+- Vercel
+- Railway
+- Heroku
+
+---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-### Development Guidelines
-- Follow TypeScript best practices
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation
-- Ensure code is linted
+---
 
-## 🐛 Known Issues & Limitations
-
-### Current Limitations
-- Email verification not implemented (future enhancement)
-- File uploads not supported yet
-- Social sharing features pending
-- Mobile app not available (web is responsive)
-- Real-time notifications pending
-
-### Workarounds
-- Use demo mode when APIs are unavailable
-- Refresh page if state becomes stale
-- Clear browser cache if experiencing issues
-
-## 🔮 Roadmap
-
-### Q1 2024
-- [ ] Email verification system
-- [ ] Notification center
-- [ ] Advanced search filters
-- [ ] Resource collections sharing
-- [ ] Export learning paths
-
-### Q2 2024
-- [ ] Mobile application (React Native)
-- [ ] Browser extension
-- [ ] Social features
-- [ ] Collaborative projects
-- [ ] Video transcripts
-
-### Q3 2024
-- [ ] Institution accounts
-- [ ] Teacher dashboard
-- [ ] LMS integration
-- [ ] Advanced analytics
-- [ ] Multi-language support
-
-### Q4 2024
-- [ ] Gamification system
-- [ ] Community forum
-- [ ] Live sessions
-- [ ] Certification system
-- [ ] API marketplace
-
-## 💼 Use Cases
-
-### For Students
-- Research project topics
-- Find learning resources
-- Track learning progress
-- Get AI guidance
-- Organize study materials
-
-### For Educators
-- Recommend resources
-- Track student progress
-- Curate learning paths
-- Discover new content
-- Share resource collections
-
-### For Researchers
-- Find academic papers
-- Discover GitHub projects
-- Track research topics
-- Organize references
-- Collaborate on projects
-
-### For Institutions
-- Student resource hub
-- Learning analytics
-- Resource curation
-- Progress monitoring
-- Platform integration
-
-## 🏆 Awards & Recognition
-
-Perfect for:
-- **Academic Projects** - BTech, MTech dissertations
-- **Hackathons** - Impressive full-stack demo
-- **Portfolio** - Showcase technical skills
-- **Startup MVP** - Launch-ready platform
-- **Job Applications** - Demonstrate expertise
-
-## 📞 Support & Contact
-
-### Get Help
-- 📧 Email: support@learnwise.ai (example)
-- 💬 GitHub Issues
-- 📖 Documentation
-- 🎥 Video tutorials (coming soon)
-
-### Community
-- GitHub Discussions
-- Discord Server (coming soon)
-- Twitter: @LearnWiseAI (example)
-
-## 📄 License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+---
 
-### Technologies
-- React Team for React
-- Vercel for Vite
-- Prisma Team for Prisma
-- OpenAI for AI capabilities
-- All open-source contributors
+## 👨‍💻 Author
 
-### Inspiration
-- Modern EdTech platforms
-- AI-powered tools
-- Student needs and feedback
-- Education technology trends
+**Mayank Kaushik**
 
-## 💡 Tips for Success
-
-### For Development
-1. Start with demo mode
-2. Test with multiple projects
-3. Try different search queries
-4. Explore all features
-5. Check admin dashboard
-
-### For Deployment
-1. Use environment variables
-2. Enable HTTPS
-3. Configure CORS properly
-4. Set up monitoring
-5. Create backups
-
-### For Presentation
-1. Prepare demo account
-2. Create sample projects
-3. Show AI features first
-4. Highlight unique aspects
-5. Discuss architecture
-
-## 📊 Project Statistics
-
-- **Total Files**: 67+
-- **Lines of Code**: 15,000+
-- **Components**: 20+
-- **API Endpoints**: 30+
-- **Database Tables**: 10+
-- **Features**: 100+
-- **Development Time**: Comprehensive
-- **Test Coverage**: Expandable
-
-## 🎓 Learning Outcomes
-
-By exploring this project, you'll learn:
-- Full-stack TypeScript development
-- React with modern patterns
-- Node.js backend architecture
-- PostgreSQL database design
-- AI API integration
-- Authentication & authorization
-- State management (Zustand)
-- REST API design
-- Responsive UI/UX
-- Deployment strategies
+- GitHub: [@mayankkaushik0008](https://github.com/mayankkaushik0008)
+- Project: [AI-Based Learning Resource Finder](https://github.com/mayankkaushik0008/AI-Based-Learning-Resoure-Finder)
 
 ---
 
-## 🌟 Final Notes
+## 🙏 Acknowledgments
 
-LearnWise AI represents a **complete, production-ready** full-stack application that demonstrates:
-- Professional software engineering
-- AI integration expertise
-- Modern development practices
-- Security consciousness
-- User-centric design
-- Scalable architecture
+- OpenAI for GPT API
+- YouTube Data API
+- GitHub API
+- OpenAlex for academic papers
+- Render for hosting
+- All open-source libraries used
 
-Perfect for portfolios, academic projects, hackathons, or as a foundation for a real EdTech startup.
+---
+
+## 📧 Contact & Support
+
+For questions, issues, or suggestions:
+- Open an issue on GitHub
+- Contact: mayankkaushik0008@gmail.com
 
 ---
 
 <div align="center">
 
-**Built with ❤️ for students, by students**
+**⭐ Star this repo if you find it helpful!**
 
-*Learn Fast. Learn Smart. Let AI Lead the Way.*
-
-[Get Started](./INSTALLATION.md) • [Deploy](./DEPLOYMENT.md) • [Features](./FEATURES.md)
-
-⭐ Star this repo if you find it helpful!
+Made with ❤️ for students struggling with resource discovery
 
 </div>
