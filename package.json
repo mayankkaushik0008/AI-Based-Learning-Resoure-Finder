@@ -13,7 +13,8 @@
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
     "build": "cd client && npm run build && cd ../server && npm run build",
-    "start": "cd server && npm start"
+    "start": "cd server && npm start",
+    "postinstall": "prisma skills sync || exit 0"
   },
   "keywords": [
     "ai",
@@ -25,6 +26,11 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "prisma": "^8.0.0-rc.33"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.119.0"
   }
 }
